@@ -19,9 +19,8 @@
         return;
     }
 
-    var _trackingUrl = 'https://api.mixpanel.com/track?ip=1&verbose=1&data=';
-    var _trackingBatchUrl = 'https://api.mixpanel.com/track#past-events-batch';
-    var _engageUrl = 'https://api.mixpanel.com/engage?ip=1&verbose=1&data=';
+    var _trackingUrl = 'https://api.mixpanel.com/track?ip=1&verbose=1';
+    var _engageUrl = 'https://api.mixpanel.com/engage?ip=1&verbose=1';
     var _token = null;
     var _debugging = false;
     var _sending = false;
@@ -274,10 +273,10 @@
                 var dataToSend = base64Encode(JSON.stringify(itemToSend));
 
                 // generate mixpanel URL (add timestamp to make it unique)
-                url += encodeURIComponent(dataToSend) + '&_=' + new Date().getTime();
+                url += '&_=' + new Date().getTime();
 
                 // execute the request
-                return httpGet(url).then(function () {
+                return httpPost(url, dataToSend).then(function () {
 
                     // mark item as completed
                     item.__completed = true;
@@ -299,15 +298,15 @@
             // mark sending complete
             _sending = false;
         })
-        .catch(function(err) {
+            .catch(function (err) {
 
-            if (_debugging) {
-                console.log(err);
-            }
+                if (_debugging) {
+                    console.log(err);
+                }
 
-            // something went wrong, allow this method to be recalled
-            _sending = false;
-        });
+                // something went wrong, allow this method to be recalled
+                _sending = false;
+            });
     }
 
     /* #region Helpers */
@@ -380,12 +379,12 @@
         remove: function (itemsToRemove) {
 
             // get array of ids to remove
-            var idsToRemove = (itemsToRemove || []).map(function(item) {
+            var idsToRemove = (itemsToRemove || []).map(function (item) {
                 return item._id;
             });
 
             // go through existing transactions, removing items that contain a matching id
-            var remaining = transactions.all().filter(function(item) {
+            var remaining = transactions.all().filter(function (item) {
                 return idsToRemove.indexOf(item._id) === -1;
             });
 
@@ -530,13 +529,13 @@
      * @param {string} url - url to get
      * @returns {Promise} executes .then if successful otherwise .catch
      */
-    function httpGet(url) {
+    function httpPost(url, bodyData) {
 
         return new Promise(function (resolve, reject) {
 
             var xhr = new XMLHttpRequest();
 
-            xhr.open('GET', url);
+            xhr.open('POST', url);
             xhr.withCredentials = true;
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === 4) {
@@ -557,7 +556,7 @@
                 }
             };
 
-            xhr.send();
+            xhr.send(`body=${bodyData}`);
         });
     }
 
@@ -644,7 +643,7 @@
         track: function (eventName, data) {
             console.log('mixpanel.track(\'' + eventName + '\',' + JSON.stringify(data || {}) + ')');
         },
-        register: function(data) {
+        register: function (data) {
             console.log('mixpanel.register(' + JSON.stringify(data || {}) + ')');
         },
         reset: function () {
