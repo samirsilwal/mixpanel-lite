@@ -19,8 +19,8 @@
         return;
     }
 
-    var _trackingUrl = 'https://api.mixpanel.com/track?ip=1&verbose=1';
-    var _engageUrl = 'https://api.mixpanel.com/engage?ip=1&verbose=1';
+    var _trackingUrl = 'https://api.mixpanel.com/track/?verbose=1&ip=1';
+    var _engageUrl = 'https://api.mixpanel.com/engage/?verbose=1&ip=1';
     var _token = null;
     var _debugging = false;
     var _sending = false;
